@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "Example project: grep-like CLI app implemented in Node.js.",
   "main": "bin/grepjs",
+  "type": "module",
   "scripts": {
-    "test": "mocha test/*.js"
+    "test": "mocha test/*.js",
+    "start": "node dist/bin/cmd.js",
+    "build": "npx tsc",
+    "try": "npm run build && npm run start"
   },
   "repository": {
     "type": "git",
@@ -22,5 +26,10 @@
   "homepage": "https://github.com/Literank/lr_grepjs#readme",
   "dependencies": {
     "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/yargs": "^17.0.32",
+    "typescript": "^5.3.3"
   }
 }

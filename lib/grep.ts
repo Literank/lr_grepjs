@@ -1,11 +1,24 @@
-const fs = require("fs");
-const path = require("path");
 
-async function grep(pattern, filePath, options = {}) {
+import fs from 'fs';
+import path from 'path';
+
+type Options  = {
+  ignoreCase: boolean;
+  invertMatch: boolean;
+}
+
+type MatchItem = [number, string];
+
+export type MatchResult = {
+  [key: string]: MatchItem[];
+}
+
+export async function grep(pattern: string, filePath: string, options: Options) {
   const { ignoreCase, invertMatch } = options;
   const lines = await _readFileLines(filePath);
   const regexFlags = ignoreCase ? "gi" : "g";
   const regex = new RegExp(pattern, regexFlags);
+  let matchingLines: MatchItem[]
   if (invertMatch) {
     matchingLines = _filterLines(regex, lines, false);
   } else {
@@ -14,7 +27,7 @@ async function grep(pattern, filePath, options = {}) {
   return { [filePath]: matchingLines };
 }
 
-async function grepRecursive(pattern, dirPath, options = {}) {
+export async function grepRecursive(pattern: string, dirPath: string, options: Options) {
   let results = {};
   try {
     const files = await fs.promises.readdir(dirPath);
@@ -32,35 +45,26 @@ async function grepRecursive(pattern, dirPath, options = {}) {
   return results;
 }
 
-function grepCount(result) {
+export function grepCount(result: MatchResult) {
   return Object.values(result).reduce(
     (count, lines) => count + lines.length,
     0
   );
 }
 
-function _filterLines(regexPattern, lines, flag) {
-  return lines
-    .map((line, lineNumber) => {
-      const match = regexPattern.test(line);
-      return flag === match ? [lineNumber + 1, line.trim()] : null;
-    })
-    .filter(Boolean);
+function _filterLines(regexPattern: RegExp, lines: string[], flag: boolean): MatchItem[] {
+  const candidates: MatchItem[] = lines.map((line, index) => [index + 1, line.trim()]);
+  return candidates
+    .filter(([_, line]) => regexPattern.test(line) === flag);
 }
 
-async function _readFileLines(filePath) {
+async function _readFileLines(filePath: string) {
   try {
     // Read the file asynchronously
     const data = await fs.promises.readFile(filePath, "utf8");
     return data.split("\n");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error reading the file:", error.message);
   }
   return [];
 }
-
-module.exports = {
-  grep,
-  grepCount,
-  grepRecursive,
-};
