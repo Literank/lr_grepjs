@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/Literank/lr_grepjs/issues"
   },
-  "homepage": "https://github.com/Literank/lr_grepjs#readme"
+  "homepage": "https://github.com/Literank/lr_grepjs#readme",
+  "dependencies": {
+    "yargs": "^17.7.2"
+  }
 }
