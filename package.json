@@ -1,0 +1,23 @@
+{
+  "name": "lr_grepjs",
+  "version": "1.0.0",
+  "description": "Example project: grep-like CLI app implemented in Node.js.",
+  "main": "bin/grepjs",
+  "scripts": {
+    "test": "mocha test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Literank/lr_grepjs.git"
+  },
+  "keywords": [
+    "grep",
+    "cli"
+  ],
+  "author": "literank.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Literank/lr_grepjs/issues"
+  },
+  "homepage": "https://github.com/Literank/lr_grepjs#readme"
+}

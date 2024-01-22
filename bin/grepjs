@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+
+const { grep } = require('../lib/grep');
+
+function main() {
+    // pattern and file name
+    const pattern = process.argv[2];
+    const fileName = process.argv[3];
+
+    if (!pattern || !fileName) {
+        console.error('Usage: grepjs <pattern> <file>');
+        process.exit(1);
+    }
+
+    // Read the file asynchronously
+    fs.readFile(fileName, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error reading file: ${err.message}`);
+            process.exit(1);
+        }
+
+        // Call grep function and log the result
+        const result = grep(pattern, data);
+        console.log(result.join('\n'));
+    });
+}
+
+main();
