@@ -1,70 +1,67 @@
+import fs from 'fs'
+import path from 'path'
 
-import fs from 'fs';
-import path from 'path';
-
-type Options  = {
-  ignoreCase: boolean;
-  invertMatch: boolean;
+interface Options {
+  ignoreCase: boolean
+  invertMatch: boolean
 }
 
-type MatchItem = [number, string];
+type MatchItem = [number, string]
 
-export type MatchResult = {
-  [key: string]: MatchItem[];
-}
+export type MatchResult = Record<string, MatchItem[]>
 
-export async function grep(pattern: string, filePath: string, options: Options) {
-  const { ignoreCase, invertMatch } = options;
-  const lines = await _readFileLines(filePath);
-  const regexFlags = ignoreCase ? "gi" : "g";
-  const regex = new RegExp(pattern, regexFlags);
+export async function grep (pattern: string, filePath: string, options: Options): Promise<MatchResult> {
+  const { ignoreCase, invertMatch } = options
+  const lines = await _readFileLines(filePath)
+  const regexFlags = ignoreCase ? 'gi' : 'g'
+  const regex = new RegExp(pattern, regexFlags)
   let matchingLines: MatchItem[]
   if (invertMatch) {
-    matchingLines = _filterLines(regex, lines, false);
+    matchingLines = _filterLines(regex, lines, false)
   } else {
-    matchingLines = _filterLines(regex, lines, true);
+    matchingLines = _filterLines(regex, lines, true)
   }
-  return { [filePath]: matchingLines };
+  return { [filePath]: matchingLines }
 }
 
-export async function grepRecursive(pattern: string, dirPath: string, options: Options) {
-  let results = {};
+export async function grepRecursive (pattern: string, dirPath: string, options: Options): Promise<MatchResult> {
+  let results = {}
   try {
-    const files = await fs.promises.readdir(dirPath);
+    const files = await fs.promises.readdir(dirPath)
     for (const file of files) {
-      const filePath = path.join(dirPath, file);
-      const isSubDir = (await fs.promises.stat(filePath)).isDirectory();
+      const filePath = path.join(dirPath, file)
+      const isSubDir = (await fs.promises.stat(filePath)).isDirectory()
       const result = !isSubDir
         ? await grep(pattern, filePath, options)
-        : await grepRecursive(pattern, filePath, options);
-      results = { ...results, ...result };
+        : await grepRecursive(pattern, filePath, options)
+      results = { ...results, ...result }
     }
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
-  return results;
+  return results
 }
 
-export function grepCount(result: MatchResult) {
+export function grepCount (result: MatchResult): number {
   return Object.values(result).reduce(
     (count, lines) => count + lines.length,
     0
-  );
+  )
 }
 
-function _filterLines(regexPattern: RegExp, lines: string[], flag: boolean): MatchItem[] {
-  const candidates: MatchItem[] = lines.map((line, index) => [index + 1, line.trim()]);
+function _filterLines (regexPattern: RegExp, lines: string[], flag: boolean): MatchItem[] {
+  const candidates: MatchItem[] = lines.map((line, index) => [index + 1, line.trim()])
   return candidates
-    .filter(([_, line]) => regexPattern.test(line) === flag);
+    .filter(([_, line]) => regexPattern.test(line) === flag)
 }
 
-async function _readFileLines(filePath: string) {
+async function _readFileLines (filePath: string): Promise<string[]> {
   try {
     // Read the file asynchronously
-    const data = await fs.promises.readFile(filePath, "utf8");
-    return data.split("\n");
+    const data = await fs.promises.readFile(filePath, 'utf8')
+    return data.split('\n')
   } catch (error: any) {
-    console.error("Error reading the file:", error.message);
+    console.error('Error reading the file:', error.message)
   }
-  return [];
+  return []
 }
