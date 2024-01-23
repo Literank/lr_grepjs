@@ -25,6 +25,31 @@ export async function grep (pattern: string, filePath: string, options: Options)
   return { [filePath]: matchingLines }
 }
 
+export async function grepMulti (pattern: string, filePaths: string[], options: Options): Promise<MatchResult> {
+  if (filePaths.length === 0) {
+    return await grep(pattern, '', options)
+  }
+  const results: MatchResult = {}
+  for (const filePath of filePaths) {
+    const result = await grep(pattern, filePath, options)
+    for (const k in result) {
+      results[k] = result[k]
+    }
+  }
+  return results
+}
+
+export async function grepRecursiveMulti (pattern: string, dirPaths: string[], options: Options): Promise<MatchResult> {
+  const results: MatchResult = {}
+  for (const dirPath of dirPaths) {
+    const result = await grepRecursive(pattern, dirPath, options)
+    for (const k in result) {
+      results[k] = result[k]
+    }
+  }
+  return results
+}
+
 export async function grepRecursive (pattern: string, dirPath: string, options: Options): Promise<MatchResult> {
   let results = {}
   try {
@@ -58,6 +83,10 @@ function _filterLines (regexPattern: RegExp, lines: string[], flag: boolean): Ma
 
 async function _readFileLines (filePath: string): Promise<string[]> {
   try {
+    const isDir = (await fs.promises.stat(filePath)).isDirectory()
+    if (isDir) { // ignore dir
+      return []
+    }
     // Read the file asynchronously
     const data = await fs.promises.readFile(filePath, 'utf8')
     return data.split('\n')

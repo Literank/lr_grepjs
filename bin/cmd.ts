@@ -2,7 +2,7 @@
 
 import yargs from 'yargs'
 
-import { grep, grepCount, grepRecursive } from '../lib/grep.js'
+import { grepMulti, grepCount, grepRecursiveMulti } from '../lib/grep.js'
 import type { MatchResult } from '../lib/grep.js'
 
 // Parse command-line options
@@ -51,7 +51,7 @@ const argv = await yargs(process.argv.slice(2))
   .demandCommand(1, 'Please provide pattern to search for.').argv
 
 const pattern = argv._[0] as string
-const filePath = argv._[1] !== undefined ? argv._[1] as string : ''
+const filePaths = argv._.slice(1) as string[]
 
 if (argv.help as boolean) {
   // Print help message and exit
@@ -63,9 +63,9 @@ const options = {
   ignoreCase: argv['ignore-case'] as boolean,
   invertMatch: argv['invert-match'] as boolean
 }
-const result = (argv.recursive as boolean && filePath !== '')
-  ? grepRecursive(pattern, filePath, options)
-  : grep(pattern, filePath, options)
+const result = (argv.recursive as boolean && filePaths.length !== 0)
+  ? grepRecursiveMulti(pattern, filePaths, options)
+  : grepMulti(pattern, filePaths, options)
 
 result
   .then((result) => {
