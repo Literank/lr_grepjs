@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import * as readline from 'readline'
 
 interface Options {
   ignoreCase: boolean
@@ -12,7 +13,7 @@ export type MatchResult = Record<string, MatchItem[]>
 
 export async function grep (pattern: string, filePath: string, options: Options): Promise<MatchResult> {
   const { ignoreCase, invertMatch } = options
-  const lines = await _readFileLines(filePath)
+  const lines = filePath === '' ? await _readStdinLines() : await _readFileLines(filePath)
   const regexFlags = ignoreCase ? 'gi' : 'g'
   const regex = new RegExp(pattern, regexFlags)
   let matchingLines: MatchItem[]
@@ -64,4 +65,23 @@ async function _readFileLines (filePath: string): Promise<string[]> {
     console.error('Error reading the file:', error.message)
   }
   return []
+}
+
+async function _readStdinLines (): Promise<string[]> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false
+  })
+
+  return await new Promise((resolve) => {
+    const lines: string[] = []
+    rl.on('line', (line) => {
+      lines.push(line)
+    })
+
+    rl.on('close', () => {
+      resolve(lines)
+    })
+  })
 }

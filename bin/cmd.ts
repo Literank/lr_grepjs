@@ -8,7 +8,7 @@ import type { MatchResult } from '../lib/grep.js'
 // Parse command-line options
 const argv = await yargs(process.argv.slice(2))
   .locale('en')
-  .usage('Usage: $0 [options] <pattern> <file>')
+  .usage('Usage: $0 [options] <pattern> [<file>]')
   .option('c', {
     alias: 'count',
     describe: 'Only a count of selected lines is written to standard output.',
@@ -48,10 +48,10 @@ const argv = await yargs(process.argv.slice(2))
     type: 'boolean',
     default: false
   })
-  .demandCommand(2, 'Please provide both pattern and file arguments.').argv
+  .demandCommand(1, 'Please provide pattern to search for.').argv
 
 const pattern = argv._[0] as string
-const filePath = argv._[1] as string
+const filePath = argv._[1] !== undefined ? argv._[1] as string : ''
 
 if (argv.help as boolean) {
   // Print help message and exit
@@ -63,7 +63,7 @@ const options = {
   ignoreCase: argv['ignore-case'] as boolean,
   invertMatch: argv['invert-match'] as boolean
 }
-const result = argv.recursive as boolean
+const result = (argv.recursive as boolean && filePath !== '')
   ? grepRecursive(pattern, filePath, options)
   : grep(pattern, filePath, options)
 
