@@ -5,7 +5,7 @@
   "main": "bin/grepjs",
   "type": "module",
   "scripts": {
-    "test": "mocha test/*.js",
+    "test": "npx jest",
     "start": "node dist/bin/cmd.js",
     "build": "npx tsc",
     "try": "npm run build && npm run start"
@@ -28,8 +28,15 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.11",
     "@types/node": "^20.11.5",
     "@types/yargs": "^17.0.32",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
     "typescript": "^5.3.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   }
 }
