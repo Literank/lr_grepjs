@@ -11,6 +11,9 @@
     "build": "npx tsc",
     "try": "npm run build && npm run start"
   },
+  "bin": {
+    "grepjs": "dist/bin/cmd.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Literank/lr_grepjs.git"
