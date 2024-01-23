@@ -9,7 +9,8 @@ test:
 lint:
 	npm run lint
 
-install:
+install: build
+	chmod +x dist/bin/cmd.js
 	npm install -g
 
 build:
