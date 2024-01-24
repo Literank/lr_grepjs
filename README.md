@@ -2,6 +2,8 @@
 
 Example project: grep-like CLI app implemented in Node.js.
 
+npm: [https://www.npmjs.com/package/lr_grepjs](https://www.npmjs.com/package/lr_grepjs)
+
 ## Install
 
 ```bash
